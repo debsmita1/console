@@ -242,7 +242,7 @@ export class ImportFlowForm extends React.Component<Props, State> {
 
   onBuilderImageChange = (selectedImage: string) => {
     const recentTag = this.builderImages[selectedImage].recentTag.name;
-    this.setState({ selectedImage, selectedImageTag: recentTag, isBuilderImageDetected: false });
+    this.setState({ selectedImage, selectedImageTag: recentTag });
     if (selectedImage !== '') {
       this.setState({ builderImageError: '' });
     }
@@ -529,6 +529,7 @@ export class ImportFlowForm extends React.Component<Props, State> {
           )
         ) {
           this.setState({
+            isBuilderImageDetected: true,
             builderImageError: `We detected '${
               res.status.buildEnvStatistics.detectedBuildTypes[0].name
             }' but there are no matching builder images, select an appropriate image.`,
@@ -578,6 +579,7 @@ export class ImportFlowForm extends React.Component<Props, State> {
       selectedSourceSecret,
       sourceSecretName,
       secretCredentials,
+      isBuilderImageDetected,
     } = this.state;
 
     const { imageStreams } = this.props;
@@ -679,7 +681,10 @@ export class ImportFlowForm extends React.Component<Props, State> {
         <BuilderImageSelector
           loadingImageStream={!imageStreams.loaded}
           loadingRecommendedImage={
-            gitUrlValidationStatus === 'ok' && !recommendedImage && !builderImageError
+            gitUrlValidationStatus === 'ok' &&
+            !recommendedImage &&
+            !builderImageError &&
+            !isBuilderImageDetected
           }
           builderImages={this.builderImages}
           builderImageError={builderImageError}
