@@ -36,17 +36,6 @@ const ODCEmptyState: React.FunctionComponent<Props> = ({ title, activeNamespace 
         </GridItem>
         <GridItem sm={6} md={6} lg={4}>
           <Card className="odc-empty-state__card">
-            <CardHeader>Browse Catalog</CardHeader>
-            <CardBody>Browse the catalog to discover, deploy and connect to services</CardBody>
-            <CardFooter>
-              <Link className="pf-c-button pf-m-secondary" to="/catalog">
-                Browse Catalog
-              </Link>
-            </CardFooter>
-          </Card>
-        </GridItem>
-        <GridItem sm={6} md={6} lg={4}>
-          <Card className="odc-empty-state__card">
             <CardHeader>Deploy Image</CardHeader>
             <CardBody>Deploy an existing image from an image registry or image stream tag</CardBody>
             <CardFooter>
@@ -61,8 +50,33 @@ const ODCEmptyState: React.FunctionComponent<Props> = ({ title, activeNamespace 
         </GridItem>
         <GridItem sm={6} md={6} lg={4}>
           <Card className="odc-empty-state__card">
+            <CardHeader>Browse Catalog</CardHeader>
+            <CardBody>Browse the catalog to discover, deploy and connect to services</CardBody>
+            <CardFooter>
+              <Link className="pf-c-button pf-m-secondary" to="/catalog">
+                Browse Catalog
+              </Link>
+            </CardFooter>
+          </Card>
+        </GridItem>
+        <GridItem sm={6} md={6} lg={4}>
+          <Card className="odc-empty-state__card">
+            <CardHeader>Import from Dockerfile</CardHeader>
+            <CardBody>Import your Dockerfile from your git repo to be built & deployed</CardBody>
+            <CardFooter>
+              <Link
+                className="pf-c-button pf-m-secondary"
+                to="/import-docker"
+              >
+                Import from Dockerfile
+              </Link>
+            </CardFooter>
+          </Card>
+        </GridItem>
+        <GridItem sm={6} md={6} lg={4}>
+          <Card className="odc-empty-state__card">
             <CardHeader>Import YAML</CardHeader>
-            <CardBody>Create or replace resources from their YAML or JSON definitions.</CardBody>
+            <CardBody>Create or replace resources from their YAML or JSON definitions</CardBody>
             <CardFooter>
               <Link
                 className="pf-c-button pf-m-secondary"

@@ -7,15 +7,12 @@ import { getActivePerspective } from '@console/internal/reducers/ui';
 import { RootState } from '@console/internal/redux';
 import { connect } from 'react-redux';
 import { ImportFormData, FirehoseList } from './import-types';
-import { NormalizedBuilderImages, normalizeBuilderImages } from '../../utils/imagestream-utils';
 import { createResources } from './import-submit-utils';
 import { validationSchema } from './import-validation-utils';
-import GitImportForm from './GitImportForm';
-import SourceToImageForm from './SourceToImageForm';
+import DockerImport from './DockerImport';
 
 export interface ImportFormProps {
   namespace: string;
-  isS2I: boolean;
   imageStreams?: FirehoseList;
 }
 
@@ -23,10 +20,9 @@ export interface StateProps {
   perspective: string;
 }
 
-const ImportForm: React.FC<ImportFormProps & StateProps> = ({
+const DockerImportForm: React.FC<ImportFormProps & StateProps> = ({
   namespace,
   imageStreams,
-  isS2I,
   perspective,
 }) => {
   const initialValues: ImportFormData = {
@@ -45,6 +41,7 @@ const ImportForm: React.FC<ImportFormProps & StateProps> = ({
       dir: '/',
       showGitType: false,
       secret: '',
+      dockerFilePath: '',
     },
     image: {
       selected: '',
@@ -86,8 +83,6 @@ const ImportForm: React.FC<ImportFormProps & StateProps> = ({
     },
     labels: {},
   };
-  const builderImages: NormalizedBuilderImages =
-    imageStreams && imageStreams.loaded && normalizeBuilderImages(imageStreams.data);
 
   const handleRedirect = (project: string) => {
     const perspectiveData = plugins.registry
@@ -98,16 +93,15 @@ const ImportForm: React.FC<ImportFormProps & StateProps> = ({
   };
 
   const handleSubmit = (values, actions) => {
-    const imageStream = builderImages[values.image.selected].obj;
 
     const {
       project: { name: projectName },
     } = values;
 
-    const dryRunRequests: Promise<K8sResourceKind[]> = createResources(values, true, imageStream);
+    const dryRunRequests: Promise<K8sResourceKind[]> = createResources(values, true, null, true);
     dryRunRequests
       .then(() => {
-        const requests: Promise<K8sResourceKind[]> = createResources(values, false, imageStream);
+        const requests: Promise<K8sResourceKind[]> = createResources(values, false, null, true);
         return requests;
       })
       .then(() => {
@@ -121,10 +115,7 @@ const ImportForm: React.FC<ImportFormProps & StateProps> = ({
   };
 
   const renderForm = (props) => {
-    if (isS2I) {
-      return <SourceToImageForm {...props} builderImages={builderImages} />;
-    }
-    return <GitImportForm {...props} builderImages={builderImages} />;
+    return <DockerImport {...props} />;
   };
 
   return (
@@ -132,7 +123,7 @@ const ImportForm: React.FC<ImportFormProps & StateProps> = ({
       initialValues={initialValues}
       onSubmit={handleSubmit}
       onReset={history.goBack}
-      validationSchema={validationSchema(true)}
+      validationSchema={validationSchema(false)}
       render={renderForm}
     />
   );
@@ -144,4 +135,4 @@ const mapStateToProps = (state: RootState): StateProps => {
   };
 };
 
-export default connect(mapStateToProps)(ImportForm);
+export default connect(mapStateToProps)(DockerImportForm);

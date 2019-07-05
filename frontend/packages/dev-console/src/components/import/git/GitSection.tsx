@@ -12,9 +12,10 @@ import SourceSecretSelector from './SourceSecretSelector';
 export interface GitSectionProps {
   project: ProjectData;
   showSample?: boolean;
+  isDockerImport?: boolean;
 }
 
-const GitSection: React.FC<GitSectionProps> = ({ project, showSample }) => {
+const GitSection: React.FC<GitSectionProps> = ({ project, showSample, isDockerImport }) => {
   const { values, setFieldValue, setFieldTouched, validateForm } = useFormikContext<FormikValues>();
   const tag = values.image.tagObj;
   const sampleRepo = showSample && getSampleRepo(tag);
@@ -83,6 +84,14 @@ const GitSection: React.FC<GitSectionProps> = ({ project, showSample }) => {
           helpText="Secret with credentials for pulling your source code."
         />
       </ExpandCollapse>
+      {isDockerImport && (
+        <InputField
+          type="text"
+          name="git.dockerFilePath"
+          label="Dockerfile Path"
+          // helpText="Dockerfile Path relative to Context Dir."
+        />
+      )}
     </FormSection>
   );
 };

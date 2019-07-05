@@ -1,6 +1,6 @@
-import { GitImportFormData } from '../import-types';
+import { ImportFormData } from '../import-types';
 
-export const mockFormData: GitImportFormData = {
+export const mockFormData: ImportFormData = {
   name: 'test-app',
   project: {
     name: 'mock-project',

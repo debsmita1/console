@@ -21,12 +21,12 @@ export interface DeployImageFormData {
   application: ApplicationData;
 }
 
-export interface GitImportFormData {
+export interface ImportFormData {
   name: string;
   project: ProjectData;
   application: ApplicationData;
   git: GitData;
-  image: ImageData;
+  image?: ImageData;
   route: RouteData;
   build: BuildData;
   deployment: DeploymentData;
@@ -65,6 +65,7 @@ export interface GitData {
   dir: string;
   showGitType: boolean;
   secret: string;
+  dockerFilePath?: string;
 }
 
 export interface RouteData {

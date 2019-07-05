@@ -21,14 +21,14 @@ describe('ValidationUtils', () => {
   describe('Validation Schema', () => {
     it('should validate the form data', async () => {
       const mockData = cloneDeep(mockFormData);
-      await validationSchema.isValid(mockData).then((valid) => expect(valid).toEqual(true));
+      await validationSchema(true).isValid(mockData).then((valid) => expect(valid).toEqual(true));
     });
 
     it('should throw an error if url is invalid', async () => {
       const mockData = cloneDeep(mockFormData);
       mockData.git.url = 'something.com';
-      await validationSchema.isValid(mockData).then((valid) => expect(valid).toEqual(false));
-      await validationSchema
+      await validationSchema(true).isValid(mockData).then((valid) => expect(valid).toEqual(false));
+      await validationSchema(true)
         .validate(mockData)
         .catch((err) => expect(err.message).toBe('Invalid Git URL.'));
     });
@@ -37,9 +37,9 @@ describe('ValidationUtils', () => {
       const mockData = cloneDeep(mockFormData);
       mockData.git.url = 'https://something.com/test/repo';
       mockData.git.type = '';
-      await validationSchema.isValid(mockData).then((valid) => expect(valid).toEqual(true));
+      await validationSchema(true).isValid(mockData).then((valid) => expect(valid).toEqual(true));
       mockData.git.showGitType = true;
-      await validationSchema.validate(mockData).catch((err) => {
+      await validationSchema(true).validate(mockData).catch((err) => {
         expect(err.message).toBe('We failed to detect the git type. Please choose a git type.');
       });
     });
@@ -47,8 +47,8 @@ describe('ValidationUtils', () => {
     it('should throw an error for required fields if empty', async () => {
       const mockData = cloneDeep(mockFormData);
       mockData.name = '';
-      await validationSchema.isValid(mockData).then((valid) => expect(valid).toEqual(false));
-      await validationSchema.validate(mockData).catch((err) => {
+      await validationSchema(true).isValid(mockData).then((valid) => expect(valid).toEqual(false));
+      await validationSchema(true).validate(mockData).catch((err) => {
         expect(err.message).toBe('Required');
         expect(err.type).toBe('required');
       });
@@ -57,8 +57,8 @@ describe('ValidationUtils', () => {
     it('should throw an error if path is invalid', async () => {
       const mockData = cloneDeep(mockFormData);
       mockData.route.path = 'path';
-      await validationSchema.isValid(mockData).then((valid) => expect(valid).toEqual(false));
-      await validationSchema.validate(mockData).catch((err) => {
+      await validationSchema(true).isValid(mockData).then((valid) => expect(valid).toEqual(false));
+      await validationSchema(true).validate(mockData).catch((err) => {
         expect(err.message).toBe('Path must start with /.');
       });
     });
@@ -66,8 +66,8 @@ describe('ValidationUtils', () => {
     it('should throw an error if hostname is invalid', async () => {
       const mockData = cloneDeep(mockFormData);
       mockData.route.hostname = 'host_name';
-      await validationSchema.isValid(mockData).then((valid) => expect(valid).toEqual(false));
-      await validationSchema.validate(mockData).catch((err) => {
+      await validationSchema(true).isValid(mockData).then((valid) => expect(valid).toEqual(false));
+      await validationSchema(true).validate(mockData).catch((err) => {
         expect(err.message).toBe(
           'Hostname must consist of lower-case letters, numbers, periods, and hyphens. It must start and end with a letter or number.',
         );

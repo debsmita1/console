@@ -9,14 +9,14 @@ import {
 import { k8sCreate, K8sResourceKind } from '@console/internal/module/k8s';
 import { makePortName } from '../../utils/imagestream-utils';
 import { getAppLabels, getPodLabels } from '../../utils/resource-label-utils';
-import { GitImportFormData } from './import-types';
+import { ImportFormData } from './import-types';
 
 const dryRunOpt = { queryParams: { dryRun: 'All' } };
 
 export const createImageStream = (
-  formData: GitImportFormData,
-  { metadata: { name: imageStreamName } }: K8sResourceKind,
+  formData: ImportFormData,
   dryRun: boolean,
+  { metadata: { name: imageStreamName } }: K8sResourceKind,
 ): Promise<K8sResourceKind> => {
   const {
     name,
@@ -34,26 +34,31 @@ export const createImageStream = (
       labels: { ...defaultLabels, ...userLabels },
     },
   };
-
   return k8sCreate(ImageStreamModel, imageStream, dryRun ? dryRunOpt : {});
 };
 
 export const createBuildConfig = (
-  formData: GitImportFormData,
-  imageStream: K8sResourceKind,
+  formData: ImportFormData,
   dryRun: boolean,
+  imageStream?: K8sResourceKind,
+  isDockerBuildStrategy?: boolean,
 ): Promise<K8sResourceKind> => {
   const {
     name,
     project: { name: namespace },
     application: { name: application },
-    git: { url: repository, ref = 'master', dir: contextDir, secret: secretName },
+    git: {
+      url: repository,
+      ref = 'master',
+      dir: contextDir,
+      secret: secretName,
+      dockerFilePath: dockerFilePath,
+    },
     image: { tag: selectedTag },
     build: { env, triggers },
     labels: userLabels,
   } = formData;
-
-  const defaultLabels = getAppLabels(name, application, imageStream.metadata.name);
+  const defaultLabels = getAppLabels(name, application, imageStream && imageStream.metadata.name);
   const buildConfig = {
     apiVersion: 'build.openshift.io/v1',
     kind: 'BuildConfig',
@@ -78,17 +83,24 @@ export const createBuildConfig = (
         },
         ...(secretName ? { sourceSecret: { name: secretName } } : {}),
       },
-      strategy: {
-        type: 'Source',
-        sourceStrategy: {
-          env,
-          from: {
-            kind: 'ImageStreamTag',
-            name: `${imageStream.metadata.name}:${selectedTag}`,
-            namespace: imageStream.metadata.namespace,
+      strategy: isDockerBuildStrategy
+        ? {
+            type: 'Docker',
+            dockerStrategy: {
+              dockerfilePath: dockerFilePath,
+            },
+          }
+        : {
+            type: 'Source',
+            sourceStrategy: {
+              env,
+              from: {
+                kind: 'ImageStreamTag',
+                name: `${imageStream.metadata.name}:${selectedTag}`,
+                namespace: imageStream.metadata.namespace,
+              },
+            },
           },
-        },
-      },
       triggers: [
         ...(triggers.image ? [{ type: 'ImageChange', imageChange: {} }] : []),
         ...(triggers.config ? [{ type: 'ConfigChange' }] : []),
@@ -100,9 +112,9 @@ export const createBuildConfig = (
 };
 
 export const createDeploymentConfig = (
-  formData: GitImportFormData,
-  imageStream: K8sResourceKind,
+  formData: ImportFormData,
   dryRun: boolean,
+  imageStream?: K8sResourceKind,
 ): Promise<K8sResourceKind> => {
   const {
     name,
@@ -112,8 +124,7 @@ export const createDeploymentConfig = (
     deployment: { env, replicas, triggers },
     labels: userLabels,
   } = formData;
-
-  const defaultLabels = getAppLabels(name, application, imageStream.metadata.name);
+  const defaultLabels = getAppLabels(name, application, imageStream && imageStream.metadata.name);
   const podLabels = getPodLabels(name);
 
   const deploymentConfig = {
@@ -158,14 +169,13 @@ export const createDeploymentConfig = (
       ],
     },
   };
-
   return k8sCreate(DeploymentConfigModel, deploymentConfig, dryRun ? dryRunOpt : {});
 };
 
 export const createService = (
-  formData: GitImportFormData,
-  imageStream: K8sResourceKind,
+  formData: ImportFormData,
   dryRun: boolean,
+  imageStream?: K8sResourceKind,
 ): Promise<K8sResourceKind> => {
   const {
     name,
@@ -176,7 +186,7 @@ export const createService = (
   } = formData;
 
   const firstPort = _.head(ports);
-  const defaultLabels = getAppLabels(name, application, imageStream.metadata.name);
+  const defaultLabels = getAppLabels(name, application, imageStream && imageStream.metadata.name);
   const podLabels = getPodLabels(name);
   const service = {
     kind: 'Service',
@@ -204,9 +214,9 @@ export const createService = (
 };
 
 export const createRoute = (
-  formData: GitImportFormData,
-  imageStream: K8sResourceKind,
+  formData: ImportFormData,
   dryRun: boolean,
+  imageStream?: K8sResourceKind,
 ): Promise<K8sResourceKind> => {
   const {
     name,
@@ -218,7 +228,7 @@ export const createRoute = (
   } = formData;
 
   const firstPort = _.head(ports);
-  const defaultLabels = getAppLabels(name, application, imageStream.metadata.name);
+  const defaultLabels = getAppLabels(name, application, imageStream && imageStream.metadata.name);
   const route = {
     kind: 'Route',
     apiVersion: 'route.openshift.io/v1',
@@ -251,9 +261,10 @@ export const createRoute = (
 };
 
 export const createResources = (
-  formData: GitImportFormData,
-  imageStream: K8sResourceKind,
+  formData: ImportFormData,
   dryRun: boolean = false,
+  imageStream?: K8sResourceKind,
+  isDockerBuildStrategy?: boolean,
 ): Promise<K8sResourceKind[]> => {
   const {
     route: { create: canCreateRoute },
@@ -261,15 +272,15 @@ export const createResources = (
   } = formData;
 
   const requests: Promise<K8sResourceKind>[] = [
-    createDeploymentConfig(formData, imageStream, dryRun),
-    createImageStream(formData, imageStream, dryRun),
-    createBuildConfig(formData, imageStream, dryRun),
+    createDeploymentConfig(formData, dryRun, imageStream),
+    createImageStream(formData, dryRun, imageStream ? imageStream : {}),
+    createBuildConfig(formData, dryRun, imageStream, isDockerBuildStrategy),
   ];
 
   if (!_.isEmpty(ports)) {
-    requests.push(createService(formData, imageStream, dryRun));
+    requests.push(createService(formData, dryRun, imageStream));
     if (canCreateRoute) {
-      requests.push(createRoute(formData, imageStream, dryRun));
+      requests.push(createRoute(formData, dryRun, imageStream));
     }
   }
 

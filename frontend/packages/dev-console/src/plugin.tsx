@@ -168,7 +168,7 @@ const plugin: Plugin<ConsumedExtensions> = [
     type: 'Page/Route',
     properties: {
       exact: true,
-      path: ['/add', '/import', '/topology', '/deploy-image'],
+      path: ['/add', '/import', '/import-docker', '/topology', '/deploy-image'],
       component: NamespaceRedirect,
     },
   },
@@ -200,6 +200,17 @@ const plugin: Plugin<ConsumedExtensions> = [
       loader: async () =>
         (await import(
           './components/import/ImportPage' /* webpackChunkName: "dev-console-import" */
+        )).default,
+    },
+  },
+  {
+    type: 'Page/Route',
+    properties: {
+      exact: true,
+      path: ['/import-docker/all-namespaces', '/import-docker/ns/:ns'],
+      loader: async () =>
+        (await import(
+          './components/import/DockerImportPage' /* webpackChunkName: "dev-console-import" */
         )).default,
     },
   },
