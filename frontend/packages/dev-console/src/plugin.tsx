@@ -118,6 +118,7 @@ const plugin: Plugin<ConsumedExtensions> = [
       componentProps: {
         name: 'Project Access',
         href: '/project-access',
+        required: FLAGS.SHOW_PROJECT_ACCESS,
         testID: 'advanced-project-access-header',
       },
     },

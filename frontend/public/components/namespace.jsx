@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import * as fuzzy from 'fuzzysearch';
 import { Status } from '@console/shared';
 
-import { NamespaceModel, ProjectModel, SecretModel } from '../models';
+import { NamespaceModel, ProjectModel, SecretModel, RoleBindingModel } from '../models';
 import { k8sGet } from '../module/k8s';
 import * as UIActions from '../actions/ui';
 import { DetailsPage, ListPage, Table, TableRow, TableData } from './factory';
@@ -31,6 +31,7 @@ import {
   humanizeCpuCores,
   humanizeDecimalBytes,
   useAccessReview,
+  checkAccess,
 } from './utils';
 import {
   createNamespaceModal,
@@ -479,6 +480,13 @@ const autocompleteFilter = (text, item) => fuzzy(text, item);
 
 const defaultBookmarks = {};
 
+const resourceAttributes = {
+  group: RoleBindingModel.apiGroup,
+  resource: RoleBindingModel.plural,
+  verb: 'get',
+  namespace: '',
+};
+
 const namespaceBarDropdownStateToProps = (state) => {
   const activeNamespace = state.UI.get('activeNamespace');
   const canListNS = state[featureReducerName].get(FLAGS.CAN_LIST_NS);
@@ -488,6 +496,7 @@ const namespaceBarDropdownStateToProps = (state) => {
 const namespaceBarDropdownDispatchToProps = (dispatch) => ({
   setActiveNamespace: (ns) => dispatch(UIActions.setActiveNamespace(ns)),
   showStartGuide: (show) => dispatch(setFlag(FLAGS.SHOW_OPENSHIFT_START_GUIDE, show)),
+  showProjectAccess: (show) => dispatch(setFlag(FLAGS.SHOW_PROJECT_ACCESS, show)),
 });
 
 class NamespaceBarDropdowns_ extends React.Component {
@@ -508,6 +517,7 @@ class NamespaceBarDropdowns_ extends React.Component {
       useProjects,
       children,
       disabled,
+      showProjectAccess,
     } = this.props;
     if (flagPending(canListNS)) {
       return null;
@@ -520,6 +530,11 @@ class NamespaceBarDropdowns_ extends React.Component {
     if (canListNS) {
       items[ALL_NAMESPACES_KEY] = allNamespacesTitle;
     }
+
+    resourceAttributes.namespace = activeNamespace;
+    checkAccess(resourceAttributes).then((res) => {
+      showProjectAccess(res.status.allowed);
+    });
 
     _.map(data, 'metadata.name')
       .sort()
