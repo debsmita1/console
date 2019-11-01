@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Formik, FormikValues, FormikHelpers } from 'formik';
 import { K8sResourceKind, k8sUpdate } from '@console/internal/module/k8s';
 import { ServiceModel } from '../../models';
-import { getRevisionItems } from '../../utils/traffic-splitting-utils';
+import { getRevisionItems, constructObjForUpdate } from '../../utils/traffic-splitting-utils';
 import TrafficSplittingModal from './TrafficSplittingModal';
 
 export interface TrafficSplittingProps {
@@ -16,19 +16,11 @@ export interface TrafficSplittingProps {
 
 export interface TrafficSplittingType {
   trafficSplitting: {
-    percentage: number;
+    percent: number;
     tag: string;
     revisionName: string;
   };
 }
-
-export const constructObjForUpdate = (traffic, service) => {
-  const obj = _.omit(service, 'status');
-  return {
-    ...obj,
-    spec: { ...obj.spec, traffic },
-  };
-};
 
 const TrafficSplitting: React.FC<TrafficSplittingProps> = ({
   service,
@@ -64,17 +56,17 @@ const TrafficSplitting: React.FC<TrafficSplittingProps> = ({
       });
   };
 
-  const handleReset = (values: FormikValues, actions: FormikHelpers<FormikValues>) => {
-    actions.setValues(initialValues);
-    cancel();
-  };
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={handleSubmit}
-      onReset={handleReset}
       render={(props) => (
-        <TrafficSplittingModal {...props} errorMessage={error} revisionItems={revisionItems} />
+        <TrafficSplittingModal
+          {...props}
+          errorMessage={error}
+          revisionItems={revisionItems}
+          onCancel={() => cancel()}
+        />
       )}
     />
   );

@@ -15,6 +15,7 @@ import {
 export interface TrafficSplittingModalProps {
   revisionItems: any;
   errorMessage?: string;
+  onCancel: () => void;
 }
 
 type Props = FormikProps<FormikValues> & TrafficSplittingModalProps;
@@ -23,8 +24,8 @@ const TrafficSplittingModal: React.FC<Props> = ({
   errorMessage,
   revisionItems,
   handleSubmit,
-  handleReset,
   isSubmitting,
+  onCancel,
 }) => {
   const handleSave = (e) => {
     e.preventDefault();
@@ -55,7 +56,7 @@ const TrafficSplittingModal: React.FC<Props> = ({
       <ModalSubmitFooter
         inProgress={isSubmitting}
         submitText="Save"
-        cancel={handleReset}
+        cancel={onCancel}
         errorMessage={errorMessage}
       />
     </form>
