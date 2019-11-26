@@ -50,7 +50,11 @@ const KebabItemEnabled: React.FC<KebabItemProps> = ({ option, onClick, onEscape,
 
 const KebabItemDisabled: React.FC<KebabItemDisabledProps> = ({ option }) => {
   return (
-    <button className="pf-c-dropdown__menu-item pf-m-disabled" data-test-action={option.label}>
+    <button
+      className="pf-c-dropdown__menu-item pf-m-disabled"
+      data-test-action={option.label}
+      disabled
+    >
       {option.label}
     </button>
   );
