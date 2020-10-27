@@ -41,7 +41,12 @@ import {
 } from '@console/internal/models';
 import * as models from './models';
 import { getKebabActionsForKind } from './utils/kebab-actions';
-import { FLAG_OPENSHIFT_PIPELINE, ALLOW_SERVICE_BINDING, FLAG_OPENSHIFT_GITOPS } from './const';
+import {
+  FLAG_OPENSHIFT_PIPELINE,
+  ALLOW_SERVICE_BINDING,
+  FLAG_OPENSHIFT_GITOPS,
+  FLAG_OPENSHIFT_HELM,
+} from './const';
 import {
   newPipelineTemplate,
   newTaskTemplate,
@@ -127,6 +132,13 @@ const plugin: Plugin<ConsumedExtensions> = [
     properties: {
       model: models.GitOpsServiceModel,
       flag: FLAG_OPENSHIFT_GITOPS,
+    },
+  },
+  {
+    type: 'FeatureFlag/Model',
+    properties: {
+      model: models.HelmModel,
+      flag: FLAG_OPENSHIFT_HELM,
     },
   },
   {
@@ -242,7 +254,7 @@ const plugin: Plugin<ConsumedExtensions> = [
       },
     },
     flags: {
-      required: [FLAGS.OPENSHIFT],
+      required: [FLAG_OPENSHIFT_HELM],
     },
   },
   {
@@ -1116,6 +1128,9 @@ const plugin: Plugin<ConsumedExtensions> = [
   },
   {
     type: 'AddAction',
+    flags: {
+      required: [FLAG_OPENSHIFT_HELM],
+    },
     properties: {
       id: 'helm',
       url: '/catalog?kind=%5B"HelmChart"%5D',

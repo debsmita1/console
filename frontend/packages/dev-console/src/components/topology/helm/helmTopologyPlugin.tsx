@@ -11,6 +11,7 @@ import {
   getTopologyFilters,
   applyDisplayOptions,
 } from './index';
+import { FLAG_OPENSHIFT_HELM } from '../../../const';
 
 export type HelmTopologyConsumedExtensions =
   | TopologyComponentFactory
@@ -31,6 +32,9 @@ export const helmTopologyPlugin: Plugin<HelmTopologyConsumedExtensions> = [
       priority: 400,
       getDataModel: getHelmTopologyDataModel,
       isResourceDepicted: getIsHelmResource,
+    },
+    flags: {
+      required: [FLAG_OPENSHIFT_HELM],
     },
   },
   {
