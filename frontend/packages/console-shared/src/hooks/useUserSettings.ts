@@ -18,6 +18,17 @@ import {
   USER_SETTING_CONFIGMAP_NAMESPACE,
 } from '../utils/user-settings';
 
+const useCounterRef = (initialValue: number = 0): [boolean, () => void, () => void] => {
+  const counterRef = React.useRef<number>(initialValue);
+  const increment = React.useCallback(() => {
+    counterRef.current += 1;
+  }, []);
+  const decrement = React.useCallback(() => {
+    counterRef.current -= 1;
+  }, []);
+  return [counterRef.current !== initialValue, increment, decrement];
+};
+
 export const useUserSettings = <T>(
   key: string,
   defaultValue?: T,
@@ -25,7 +36,7 @@ export const useUserSettings = <T>(
 ): [T, React.Dispatch<React.SetStateAction<T>>, boolean] => {
   const defaultValueRef = React.useRef<T>(defaultValue);
   const keyRef = React.useRef<string>(key);
-  const isRequestPending = React.useRef<boolean>(false);
+  const [isRequestPending, increaseRequest, decreaseRequest] = useCounterRef();
   const userUid = useSelector(
     (state: RootState) => state.UI.get('user')?.metadata?.uid ?? 'kubeadmin',
   );
@@ -97,39 +108,41 @@ export const useUserSettings = <T>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cfLoadError, cfLoaded, fallbackLocalStorage]);
 
-  React.useEffect(() => {
-    if (sync && !isRequestPending.current) {
-      if (
-        cfData &&
-        cfLoaded &&
-        seralizeData(settingsRef.current) !== cfData?.data?.[keyRef.current]
-      ) {
-        setSettings(deseralizeData(cfData?.data?.[keyRef.current]));
-      }
-    }
-  }, [cfData, cfLoaded, sync]);
-
   const callback = React.useCallback<React.Dispatch<React.SetStateAction<T>>>(
     (action: React.SetStateAction<T>) => {
-      if (isRequestPending.current) return;
       const previousSettings = settingsRef.current;
       const newState =
         typeof action === 'function' ? (action as (prevState: T) => T)(previousSettings) : action;
       setSettings(newState);
       if (cfLoaded) {
-        isRequestPending.current = true;
+        increaseRequest();
         updateConfigMap(cfData, keyRef.current, seralizeData(newState))
           .then(() => {
-            isRequestPending.current = false;
+            decreaseRequest();
           })
           .catch(() => {
+            decreaseRequest();
             setSettings(previousSettings);
-            isRequestPending.current = false;
           });
       }
     },
-    [cfData, cfLoaded],
+    [cfData, cfLoaded, decreaseRequest, increaseRequest],
   );
 
-  return fallbackLocalStorage ? [lsData, setLsDataCallback, true] : [settings, callback, loaded];
+  const resultedSettings = React.useMemo(() => {
+    if (
+      sync &&
+      !isRequestPending &&
+      cfData &&
+      cfLoaded &&
+      seralizeData(settingsRef.current) !== cfData?.data?.[keyRef.current]
+    ) {
+      return deseralizeData(cfData?.data?.[keyRef.current]);
+    }
+    return settings;
+  }, [sync, isRequestPending, cfData, cfLoaded, settings]);
+
+  return fallbackLocalStorage
+    ? [lsData, setLsDataCallback, true]
+    : [resultedSettings, callback, loaded];
 };

@@ -58,11 +58,14 @@ export const updateConfigMap = async (configMap: ConfigMapKind, key: string, val
     ];
     try {
       await k8sPatch(ConfigMapModel, configMap, patch);
+      return Promise.resolve();
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
+      return Promise.reject();
     }
   }
+  return Promise.resolve();
 };
 
 export const deseralizeData = (data: string | null) => {
