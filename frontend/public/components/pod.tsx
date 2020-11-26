@@ -2,14 +2,14 @@ import * as React from 'react';
 // FIXME upgrading redux types is causing many errors at this time
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
-import { connect, useSelector } from 'react-redux';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { sortable } from '@patternfly/react-table';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
 import * as classNames from 'classnames';
 import * as _ from 'lodash-es';
-import { Status } from '@console/shared';
+import { Status, useTableColumns } from '@console/shared';
 import { ByteDataTypes } from '@console/shared/src/graph-helper/data-utils';
 
 import * as UIActions from '../actions/ui';
@@ -59,7 +59,6 @@ import {
 import { VolumesTable } from './volumes-table';
 import { PodModel } from '../models';
 import { Conditions } from './conditions';
-import { RootState } from '../redux';
 
 // Only request metrics if the device's screen width is larger than the
 // breakpoint where metrics are visible.
@@ -183,7 +182,6 @@ const columnManagementID = referenceForModel(PodModel);
 
 const podRowStateToProps = ({ UI }) => ({
   metrics: UI.getIn(['metrics', 'pod']),
-  selectedColumns: UI.getIn(['columnManagement']),
 });
 
 const getHeader = (showNodes) => {
@@ -305,7 +303,6 @@ const PodTableRow = connect<PodTableRowPropsFromState, null, PodTableRowProps>(p
     style,
     metrics,
     showNodes,
-    selectedColumns,
   }: PodTableRowProps & PodTableRowPropsFromState) => {
     const { name, namespace, creationTimestamp, labels } = pod.metadata;
     const { readyCount, totalContainers } = podReadiness(pod);
@@ -313,9 +310,9 @@ const PodTableRow = connect<PodTableRowPropsFromState, null, PodTableRowProps>(p
     const restarts = podRestarts(pod);
     const bytes: number = _.get(metrics, ['memory', namespace, name]);
     const cores: number = _.get(metrics, ['cpu', namespace, name]);
-    const columns = new Set(
-      selectedColumns?.get(columnManagementID) || getSelectedColumns(showNodes),
-    );
+    const [tableColumns, , loaded] = useTableColumns(columnManagementID);
+    const columns =
+      loaded && tableColumns?.length > 0 ? new Set(tableColumns) : getSelectedColumns(showNodes);
     return (
       <TableRow id={pod.metadata.uid} index={index} trKey={rowKey} style={style}>
         <TableData className={podColumnInfo.name.classes}>
@@ -726,9 +723,12 @@ const getRow = (showNodes) => {
 export const PodList: React.FC<PodListProps> = (props) => {
   const showNodes = props?.customData?.showNodes;
   const { t } = useTranslation();
+  const [tableColumns, , loaded] = useTableColumns(columnManagementID);
+  const selectedColumns = loaded && tableColumns?.length > 0 ? new Set(tableColumns) : null;
   return (
     <Table
       {...props}
+      activeColumns={selectedColumns}
       columnManagementID={columnManagementID}
       aria-label={t('workload~Pods')}
       Header={getHeader(showNodes)}
@@ -767,9 +767,7 @@ export const PodsPage = connect<{}, PodPagePropsFromDispatch, PodPageProps>(
   dispatchToProps,
 )((props: PodPageProps & PodPagePropsFromDispatch) => {
   const { canCreate = true, namespace, setPodMetrics, customData, ...listProps } = props;
-  const selectedColumns: Set<string> = new Set(
-    useSelector<RootState, string>(({ UI }) => UI.getIn(['columnManagement', columnManagementID])),
-  );
+  const [tableColumns, , loaded] = useTableColumns(columnManagementID);
   /* eslint-disable react-hooks/exhaustive-deps */
   React.useEffect(() => {
     if (showMetrics) {
@@ -804,7 +802,7 @@ export const PodsPage = connect<{}, PodPagePropsFromDispatch, PodPageProps>(
           _.pick(column, ['title', 'additional', 'id']),
         ),
         id: columnManagementID,
-        selectedColumns,
+        selectedColumns: loaded && tableColumns?.length > 0 ? new Set(tableColumns) : null,
         type: 'Pod',
       }}
     />
@@ -858,7 +856,6 @@ type PodTableRowProps = {
 
 type PodTableRowPropsFromState = {
   metrics: UIActions.PodMetrics;
-  selectedColumns: Map<string, Set<string>>;
 };
 
 type PodListProps = {
