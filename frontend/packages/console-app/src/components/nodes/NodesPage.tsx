@@ -2,7 +2,7 @@ import * as React from 'react';
 // FIXME upgrading redux types is causing many errors at this time
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
-import { connect, useSelector } from 'react-redux';
+import { connect } from 'react-redux';
 import * as _ from 'lodash';
 import { sortable } from '@patternfly/react-table';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +13,7 @@ import {
   getNodeRole,
   getLabels,
   getNodeMachineNameAndNamespace,
+  useTableColumns,
 } from '@console/shared';
 import { NodeModel, MachineModel } from '@console/internal/models';
 import { NodeKind, referenceForModel } from '@console/internal/module/k8s';
@@ -40,7 +41,6 @@ import { nodeStatus } from '../../status/node';
 import NodeRoles from './NodeRoles';
 import { menuActions } from './menu-actions';
 import NodeStatus from './NodeStatus';
-import { RootState } from '@console/internal/redux';
 import MarkAsSchedulablePopover from './popovers/MarkAsSchedulablePopover';
 
 // t('nodes~Name')
@@ -232,12 +232,10 @@ const getSelectedColumns = () => {
 
 const mapStateToProps = ({ UI }) => ({
   metrics: UI.getIn(['metrics', 'node']),
-  selectedColumns: UI.getIn(['columnManagement']),
 });
 
 type NodesRowMapFromStateProps = {
   metrics: NodeMetrics;
-  selectedColumns: Map<string, Set<string>>;
 };
 
 const NodesTableRow = connect<NodesRowMapFromStateProps, null, NodesTableRowProps>(mapStateToProps)(
@@ -247,8 +245,8 @@ const NodesTableRow = connect<NodesRowMapFromStateProps, null, NodesTableRowProp
     rowKey,
     style,
     metrics,
-    selectedColumns,
   }: NodesTableRowProps & NodesRowMapFromStateProps) => {
+    const [tableColumns, , loaded] = useTableColumns(columnManagementID);
     const nodeName = getName(node);
     const nodeUID = getUID(node);
     const usedMem = metrics?.usedMemory?.[nodeName];
@@ -274,7 +272,8 @@ const NodesTableRow = connect<NodesRowMapFromStateProps, null, NodesTableRowProp
     const instanceType = node.metadata.labels?.['beta.kubernetes.io/instance-type'];
     const labels = getLabels(node);
     const zone = node.metadata.labels?.['topology.kubernetes.io/zone'];
-    const columns = new Set(selectedColumns?.get(columnManagementID) || getSelectedColumns());
+    const columns =
+      loaded && tableColumns?.length > 0 ? new Set(tableColumns) : getSelectedColumns();
     return (
       <TableRow id={nodeUID} index={index} trKey={rowKey} style={style}>
         <TableData className={nodeColumnInfo.name.classes}>
@@ -473,9 +472,7 @@ const NodesPage = connect<{}, MapDispatchToProps>(
   mapDispatchToProps,
 )((props: MapDispatchToProps) => {
   const { setNodeMetrics: setMetrics } = props;
-  const selectedColumns: Set<string> = new Set(
-    useSelector<RootState, string>(({ UI }) => UI.getIn(['columnManagement', columnManagementID])),
-  );
+  const [tableColumns, , loaded] = useTableColumns(columnManagementID);
 
   React.useEffect(() => {
     const updateMetrics = () =>
@@ -530,7 +527,7 @@ const NodesPage = connect<{}, MapDispatchToProps>(
       columnLayout={{
         columns: NodeTableHeader().map((column) => _.pick(column, ['title', 'additional', 'id'])),
         id: columnManagementID,
-        selectedColumns,
+        selectedColumns: loaded && tableColumns?.length > 0 ? new Set(tableColumns) : null,
         type: 'Node',
       }}
     />

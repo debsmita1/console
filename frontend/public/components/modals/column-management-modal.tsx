@@ -2,7 +2,6 @@ import * as React from 'react';
 // FIXME upgrading redux types is causing many errors at this time
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
-import { useDispatch } from 'react-redux';
 import {
   Alert,
   DataList,
@@ -14,8 +13,8 @@ import {
 } from '@patternfly/react-core';
 import { useTranslation } from 'react-i18next';
 
+import { useTableColumns } from '@console/shared';
 import { createModalLauncher, ModalTitle, ModalBody, ModalSubmitFooter } from '../factory';
-import { setTableColumns } from '../../actions/ui';
 
 export const MAX_VIEW_COLS = 9;
 
@@ -57,15 +56,21 @@ export const ColumnManagementModal: React.FC<ColumnManagementModalProps> = ({
   columnLayout,
 }) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
+  const [, setTableColumns] = useTableColumns(columnLayout.id);
   const defaultColumns = columnLayout.columns.filter((column) => column.id && !column.additional);
   const additionalColumns = columnLayout.columns.filter((column) => column.additional);
 
   const [checkedColumns, setCheckedColumns] = React.useState(
-    columnLayout.selectedColumns.size !== 0
+    columnLayout.selectedColumns && columnLayout.selectedColumns.size !== 0
       ? new Set(columnLayout.selectedColumns)
       : new Set(defaultColumns.map((col) => col.id)),
   );
+
+  /*React.useEffect(() => {
+    loaded && tableColumns.length !== 0
+      ? setCheckedColumns(new Set(tableColumns))
+      : setCheckedColumns(new Set(defaultColumns.map((col) => col.id)));
+  }, [loaded, setCheckedColumns]);*/
 
   const onColumnChange = (checked: boolean, event: React.SyntheticEvent): void => {
     const updatedCheckedColumns = new Set<string>(checkedColumns);
@@ -82,7 +87,7 @@ export const ColumnManagementModal: React.FC<ColumnManagementModalProps> = ({
     columnLayout.columns.forEach(
       (column) => checkedColumns.has(column.id) && orderedCheckedColumns.add(column.id),
     );
-    dispatch(setTableColumns(columnLayout.id, orderedCheckedColumns));
+    setTableColumns(orderedCheckedColumns);
     close();
   };
 
