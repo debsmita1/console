@@ -1,0 +1,37 @@
+[
+    {
+        "name": "nodejs-basic",
+        "displayName": "Basic NodeJS",
+        "description": "A simple Hello world NodeJS application",
+        "type": "sample",
+        "tags": [
+            "NodeJS",
+            "Express"
+        ],
+        "projectType": "nodejs",
+        "language": "nodejs",
+        "git": {
+            "remotes": {
+                "origin": "https://github.com/redhat-developer/devfile-sample"
+            }
+        }
+    },
+    {
+        "name": "nodejs-basic-2",
+        "displayName": "Basic NodeJS 2",
+        "description": "A simple Hello world NodeJS application 2",
+        "icon": "nodejs-icon.png",
+        "type": "sample",
+        "tags": [
+            "NodeJS",
+            "Express"
+        ],
+        "projectType": "nodejs",
+        "language": "nodejs",
+        "git": {
+            "remotes": {
+                "origin": "https://github.com/maysunfaisal/node-bulletin-board-2"
+            }
+        }
+    }
+]

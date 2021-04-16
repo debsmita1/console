@@ -9,6 +9,7 @@ import (
 	buildv1 "github.com/openshift/api/build/v1"
 	imagev1 "github.com/openshift/api/image/v1"
 	routev1 "github.com/openshift/api/route/v1"
+	devfilePkg "github.com/openshift/console/pkg/devfile"
 	"github.com/openshift/console/pkg/serverutils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -21,6 +22,35 @@ import (
 	"github.com/devfile/library/pkg/devfile/parser"
 	"github.com/devfile/library/pkg/devfile/parser/data/v2/common"
 )
+
+func (s *Server) devfileSamplesHandler(w http.ResponseWriter, r *http.Request) {
+
+	var data devfileSamplesForm
+	registry := "sample-placeholder.json"
+
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		errMsg := fmt.Sprintf("Failed to decode response: %v", err)
+		klog.Error(errMsg)
+		serverutils.SendResponse(w, http.StatusBadRequest, serverutils.ApiError{Err: errMsg})
+		return
+	}
+
+	if data.Registry != "" {
+		registry = data.Registry
+	}
+
+	sampleIndex, err := devfilePkg.GetRegistrySamples(registry)
+	if err != nil {
+		errMsg := fmt.Sprintf("Failed to read from registry %s: %v", registry, err)
+		klog.Error(errMsg)
+		serverutils.SendResponse(w, http.StatusBadRequest, serverutils.ApiError{Err: errMsg})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(sampleIndex)
+}
 
 func (s *Server) devfileHandler(w http.ResponseWriter, r *http.Request) {
 	var (
