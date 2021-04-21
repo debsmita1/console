@@ -51,6 +51,8 @@ const ImportForm: React.FC<ImportFormProps & StateProps> = ({
   projects,
 }) => {
   const { t } = useTranslation();
+  const searchParams = new URLSearchParams(window.location.search);
+  const gitRepoUrl = searchParams.get('gitRepoUrl');
   const [perspective] = useActivePerspective();
   const perspectiveExtensions = useExtensions<Perspective>(isPerspective);
   const postFormCallback = usePostFormSubmitAction();
@@ -71,7 +73,7 @@ const ImportForm: React.FC<ImportFormProps & StateProps> = ({
       enabled: false,
     },
     git: {
-      url: '',
+      url: importData.buildStrategy === 'Devfile' ? gitRepoUrl : '',
       type: '',
       ref: '',
       dir: '/',
