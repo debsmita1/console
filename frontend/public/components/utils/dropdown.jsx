@@ -645,6 +645,17 @@ class ActionsMenuDropdown_ extends DropdownMixin {
         history.push(option.href);
       }
 
+      if (_.isFunction(option.cta)) {
+        option.cta();
+      } else if (_.isObject(option.cta)) {
+        const { href, external } = option.cta;
+        if (external) {
+          window.open(href);
+        } else {
+          history.push(href);
+        }
+      }
+
       this.hide();
     };
     return (

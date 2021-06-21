@@ -7,6 +7,7 @@ import {
   isGraph,
 } from '@patternfly/react-topology';
 import i18next from 'i18next';
+import * as _ from 'lodash';
 import {
   history,
   KebabItem,
@@ -31,6 +32,16 @@ const onKebabOptionClick = (option: KebabOption) => {
   }
   if (option.href) {
     history.push(option.href);
+  }
+  if (_.isFunction(option.cta)) {
+    option.cta();
+  } else if (_.isObject(option.cta)) {
+    const { href, external } = option.cta;
+    if (external) {
+      window.open(href);
+    } else {
+      history.push(href);
+    }
   }
 };
 

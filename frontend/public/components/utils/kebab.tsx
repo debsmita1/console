@@ -582,6 +582,7 @@ export type KebabOption = {
   path?: string;
   pathKey?: string;
   icon?: React.ReactNode;
+  cta?: (() => void) | { href: string; external?: boolean };
 };
 
 export type KebabAction = (

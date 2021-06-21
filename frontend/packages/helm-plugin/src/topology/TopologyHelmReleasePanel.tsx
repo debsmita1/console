@@ -11,10 +11,11 @@ import {
   StatusBox,
   ActionsMenu,
 } from '@console/internal/components/utils';
+import { ActionsLoader } from '@console/shared';
 import TopologyGroupResourcesPanel from '@console/topology/src/components/side-bar/TopologyGroupResourcesPanel';
 import { getResource } from '@console/topology/src/utils/topology-utils';
 import HelmReleaseOverview from '../components/details-page/overview/HelmReleaseOverview';
-import { helmReleaseActions } from './actions/helmReleaseActions';
+import { HelmActionOrigins } from '../types/helm-types';
 import TopologyHelmReleaseNotesPanel from './TopologyHelmReleaseNotesPanel';
 
 type PropsFromState = {
@@ -50,6 +51,12 @@ export const ConnectedTopologyHelmReleasePanel: React.FC<TopologyHelmReleasePane
   const name = helmRelease.getLabel();
   const { namespace } = getResource(helmRelease).metadata;
 
+  const actionsScope = {
+    releaseName: name,
+    namespace,
+    actionOrigin: HelmActionOrigins.topology,
+  };
+
   const detailsComponent = !secret
     ? () => (
         <StatusBox
@@ -75,7 +82,6 @@ export const ConnectedTopologyHelmReleasePanel: React.FC<TopologyHelmReleasePane
 
   const releaseNotesComponent = () => <TopologyHelmReleaseNotesPanel releaseNotes={releaseNotes} />;
 
-  const actions = helmReleaseActions(helmRelease);
   return (
     <div className="overview__sidebar-pane resource-overview">
       <div className="overview__sidebar-pane-head resource-overview__heading">
@@ -91,11 +97,11 @@ export const ConnectedTopologyHelmReleasePanel: React.FC<TopologyHelmReleasePane
               </Link>
             )}
           </div>
-          {actions?.length && (
-            <div className="co-actions">
-              <ActionsMenu actions={helmReleaseActions(helmRelease)} />
-            </div>
-          )}
+          <div className="co-actions">
+            <ActionsLoader contextId="helm-actions" scope={actionsScope}>
+              {(actions, loaded) => loaded && <ActionsMenu actions={actions} />}
+            </ActionsLoader>
+          </div>
         </h1>
       </div>
       <SimpleTabNav
