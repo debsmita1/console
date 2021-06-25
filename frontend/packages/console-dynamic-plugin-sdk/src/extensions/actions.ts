@@ -97,12 +97,15 @@ export type Action = {
   id: string;
   /** The label to display in the UI. */
   label: string;
+  labelKind?: any;
   /** Executable callback or href.
    * External links should automatically provide an external link icon on action.
    * */
   cta: (() => void) | { href: string; external?: boolean };
   /** Whether the action is disabled. */
   disabled?: boolean;
+  /** Whether the action should be hidden. */
+  hidden?: boolean;
   /** The tooltip for this action. */
   tooltip?: string;
   /** The icon for this action. */
