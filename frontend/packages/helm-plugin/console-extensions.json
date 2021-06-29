@@ -57,6 +57,30 @@
     }
   },
   {
+    "type": "console.action/group",
+    "properties": {
+      "id": "common-1",
+      "label": "Common Group 1",
+      "submenu": true
+    }
+  },
+  {
+    "type": "console.action/group",
+    "properties": {
+      "id": "common-2",
+      "label": "Common Group 2",
+      "insertAfter": "common-1"
+    }
+  },
+  {
+    "type": "console.action/group",
+    "properties": {
+      "id": "child-1",
+      "label": "Child Group 1",
+      "submenu": true
+    }
+  },
+  {
     "type": "console.navigation/href",
     "properties": {
       "id": "helm",

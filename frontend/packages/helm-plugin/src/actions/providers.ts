@@ -1,6 +1,13 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { getHelmDeleteAction, getHelmRollbackAction, getHelmUpgradeAction } from './creators';
+import {
+  getHelmDeleteAction,
+  getHelmRollbackAction,
+  getHelmRollbackAction1,
+  getHelmRollbackAction2,
+  getHelmUpgradeAction,
+  getHelmUpgradeAction1,
+} from './creators';
 import { HelmActionsScope } from './types';
 
 export const useHelmActionProvider = (scope: HelmActionsScope) => {
@@ -9,6 +16,9 @@ export const useHelmActionProvider = (scope: HelmActionsScope) => {
     () => [
       getHelmUpgradeAction(scope, t),
       getHelmRollbackAction(scope, t),
+      getHelmUpgradeAction1(scope, t),
+      getHelmRollbackAction1(scope, t),
+      getHelmRollbackAction2(scope, t),
       getHelmDeleteAction(scope, t),
     ],
     [scope, t],
