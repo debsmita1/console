@@ -24,7 +24,7 @@ const ActionItem: React.FC<ActionMenuItemProps & { isAllowed: boolean }> = ({
   const { id, label, icon, disabled, cta } = action;
   const { href, external } = cta as { href: string; external?: boolean };
   const isDisabled = !isAllowed || disabled;
-  const classes = classNames({ 'pf-m-disabled': isDisabled });
+  const classes = classNames('pf-c-dropdown__menu-item', { 'pf-m-disabled': isDisabled });
 
   const handleClick = React.useCallback(
     (event) => {

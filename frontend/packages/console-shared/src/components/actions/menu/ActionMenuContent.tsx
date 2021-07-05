@@ -121,7 +121,7 @@ const SubMenuContent: React.FC<GroupMenuContentProps> = ({ option, onClick }) =>
 
 type ActionMenuContentProps = {
   options: MenuOption[];
-  onClick: () => void;
+  onClick?: () => void;
   focusItem?: MenuOption;
 };
 
