@@ -80,7 +80,9 @@ const AccessReviewActionItem = connect(impersonateStateToProps)(
 const ActionMenuItem: React.FC<ActionMenuItemProps> = (props) => {
   const { action } = props;
   let item;
-
+  if (action.hidden) {
+    return null;
+  }
   if (action.accessReview) {
     item = <AccessReviewActionItem {...props} />;
   } else {

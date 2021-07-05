@@ -7,11 +7,7 @@ export const contextMenuActions = (element: Node): React.ReactElement[] => {
   return [
     <ActionsLoader contextId="topology-actions" scope={element}>
       {(loader) => {
-        return (
-          loader.loaded && (
-            <ActionMenuContent options={loader.options} focusItem={loader.options[0]} />
-          )
-        );
+        return loader.loaded && <ActionMenuContent options={loader.options} />;
       }}
     </ActionsLoader>,
   ];

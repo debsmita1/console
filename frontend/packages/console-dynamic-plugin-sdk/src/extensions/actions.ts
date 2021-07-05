@@ -100,6 +100,7 @@ export type Action = {
   /** Executable callback or href.
    * External links should automatically provide an external link icon on action.
    * */
+  labelKind?: { [key: string]: string | string[] };
   cta: (() => void) | { href: string; external?: boolean };
   /** Whether the action is disabled. */
   disabled?: boolean;
@@ -122,4 +123,6 @@ export type Action = {
   insertAfter?: string | string[];
   /** Describes the access check to perform. */
   accessReview?: AccessReviewResourceAttributes;
+  /** Hide the action */
+  hidden?: boolean;
 };

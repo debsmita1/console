@@ -65,5 +65,12 @@
     "flags": {
       "required": ["CAN_LIST_VSC"]
     }
+  },
+  {
+    "type": "console.action/provider",
+    "properties": {
+      "contextId": "topology-actions",
+      "provider": { "$codeRef": "actions.useWorkloadActionProvider" }
+    }
   }
 ]
