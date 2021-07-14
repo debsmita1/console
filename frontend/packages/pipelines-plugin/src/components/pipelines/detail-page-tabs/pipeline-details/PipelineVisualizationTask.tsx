@@ -249,8 +249,10 @@ const TaskComponent: React.FC<TaskProps> = ({
     );
   }
 
-  const taskColor = showStatusState
-    ? taskStatusColor
+  const whenExpressionDiamondColor = showStatusState
+    ? status.reason === runStatus.Failed
+      ? getRunStatusColor(runStatus.Succeeded).pftoken.value
+      : taskStatusColor
     : !isFinallyTask
     ? greyBackgroundColor.value
     : lightBackgroundColor.value;
@@ -261,8 +263,8 @@ const TaskComponent: React.FC<TaskProps> = ({
         <WhenExpressionDecorator
           width={WHEN_EXPRESSSION_DIAMOND_SIZE}
           height={WHEN_EXPRESSSION_DIAMOND_SIZE}
-          stroke={showStatusState ? taskColor : undefined}
-          color={taskColor}
+          stroke={showStatusState ? whenExpressionDiamondColor : undefined}
+          color={whenExpressionDiamondColor}
           appendLine={!hasRunAfter && !isFinallyTask}
           status={status.reason}
           enableTooltip

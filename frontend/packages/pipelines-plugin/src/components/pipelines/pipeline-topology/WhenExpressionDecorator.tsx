@@ -56,6 +56,7 @@ const WhenExpressionDecorator: React.FC<WhenExpressionDecoratorProps> = ({
   let tooltipContent;
   switch (status) {
     case runStatus.Succeeded:
+    case runStatus.Failed:
       tooltipContent = t('pipelines-plugin~When expression was met');
       break;
     case runStatus.Skipped:

@@ -76,7 +76,9 @@ describe('WhenExpressionDecorator', () => {
 
     expect(wrapper.find(Tooltip).props().content).toEqual(whenExpressionContent('When expression'));
     wrapper.setProps({ enableTooltip: true, status: runStatus.Failed });
-    expect(wrapper.find(Tooltip).props().content).toEqual(whenExpressionContent('When expression'));
+    expect(wrapper.find(Tooltip).props().content).toEqual(
+      whenExpressionContent('When expression was met'),
+    );
     wrapper.setProps({ enableTooltip: true, status: runStatus.Pending });
     expect(wrapper.find(Tooltip).props().content).toEqual(whenExpressionContent('When expression'));
     wrapper.setProps({ enableTooltip: true, status: runStatus['In Progress'] });
