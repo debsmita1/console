@@ -43,10 +43,15 @@ func (m *Mangler) modifier(request *http.Request) {
 }
 
 func StartTestEnvironment() {
+	crdFiles := []string{
+		filepath.Join("pkg/testenv/static/project.yaml"), // added to the project manually
+	}
+
+	fmt.Printf("CRD files (CRDDirectoryPaths): %v\n", crdFiles)
+
 	testEnvironment := &envtest.Environment{
-		CRDDirectoryPaths: []string{
-			filepath.Join("static"), // added to the project manually
-		},
+		ErrorIfCRDPathMissing: true,
+		CRDDirectoryPaths:     crdFiles,
 	}
 
 	fmt.Print("Starting test-env....\n")
