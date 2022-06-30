@@ -10,6 +10,9 @@ import (
 func Setup(files []string) {
 	klog.Infoln("Test environment enabled. Will automatically load this files:")
 	for _, filename := range files {
+		if filename == "" {
+			continue
+		}
 		lowercaseFilename := strings.ToLower(filename)
 		if strings.HasSuffix(lowercaseFilename, ".yaml") || strings.HasSuffix(lowercaseFilename, ".yml") {
 			klog.Infof(" - %s\n", filename)
