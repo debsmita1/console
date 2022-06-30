@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 )
@@ -48,7 +49,7 @@ func StartTestEnvironment() {
 		},
 	}
 
-	fmt.Print("Starting server....\n")
+	fmt.Print("Starting test-env....\n")
 
 	cfg, err := testEnvironment.Start()
 
@@ -56,16 +57,6 @@ func StartTestEnvironment() {
 		fmt.Print(err)
 		os.Exit(127)
 	}
-
-	fmt.Printf("KubeAPI started!\n")
-
-	if err != nil {
-		fmt.Print(err)
-		os.Exit(127)
-	}
-
-	fmt.Printf("Started... ")
-	fmt.Printf("%v", testEnvironment.Config.Host)
 
 	os.WriteFile("/tmp/cert.cert", cfg.TLSClientConfig.CertData, 0664)
 	os.WriteFile("/tmp/ca.cert", cfg.TLSClientConfig.CAData, 0664)
@@ -93,10 +84,16 @@ func StartTestEnvironment() {
 			},
 		},
 	}
-	server := http.Server{
+	proxyServer := http.Server{
 		Addr:    "0.0.0.0:8090",
 		Handler: &proxy,
 	}
+
+	fmt.Print("test-env started!\n\n")
+	fmt.Printf("  API server:\n\n    %v\n\n", testEnvironment.Config.Host)
+	fmt.Printf("  Proxied API server (no authentification is needed):\n\n    %v\n\n", "http://localhost:8090/")
+	// fmt.Printf("Bearer token.. %v\n", testEnvironment.Config.BearerToken)
+	// fmt.Printf("Config..       %v\n", testEnvironment.Config)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -105,13 +102,15 @@ func StartTestEnvironment() {
 		fmt.Printf("\nloop")
 		for sig := range c {
 			fmt.Printf("\n%v", sig)
-			fmt.Println("\nQuitting...")
+			fmt.Println("\nShutdown proxy server...")
+			proxyServer.Shutdown(context.Background())
+			fmt.Println("\nShutdown test-env...")
 			testEnvironment.Stop()
-			server.Shutdown(context.Background())
 			os.Exit(0)
 		}
 	}()
 
-	server.ListenAndServe()
-
+	go func() {
+		proxyServer.ListenAndServe()
+	}()
 }
