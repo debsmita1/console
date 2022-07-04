@@ -55,9 +55,6 @@ func Setup(files []string, flags *flag.FlagSet) {
 	crdFiles := []string{}
 	resourceWatcherFiles := []string{}
 	crdFiles, resourceWatcherFiles = organizeFiles(files, crdFiles, resourceWatcherFiles)
-	StartTestEnvironment(crdFiles, flags)
-	// Set bridge configuration flags so that the bridge automatically use the test-env
-
 	fmt.Printf("Resource watcher files: %v\n", resourceWatcherFiles)
-
+	StartTestEnvironment(crdFiles, resourceWatcherFiles, flags)
 }

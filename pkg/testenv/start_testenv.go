@@ -42,9 +42,18 @@ func (m *Mangler) modifier(request *http.Request) {
 	fmt.Printf("\n\n%v\n\n", request)
 }
 
-func StartTestEnvironment(crdFiles []string, flags *flag.FlagSet) {
+func StartTestEnvironment(crdFiles []string, resourceWatcherFiles []string, flags *flag.FlagSet) {
 
 	fmt.Printf("CRD files (CRDDirectoryPaths): %v\n", crdFiles)
+	name := "test-env/test-env-framework/node_modules/.bin/ts-node"
+
+	procAttr := new(os.ProcAttr)
+	procAttr.Files = []*os.File{os.Stdin, os.Stdout, os.Stderr}
+	if process, err := os.StartProcess(name, resourceWatcherFiles, procAttr); err != nil {
+		fmt.Printf("ERROR Unable to run %s: %s\n", name, err.Error())
+	} else {
+		fmt.Printf("%s running as pid %d\n", name, process.Pid)
+	}
 
 	testEnvironment := &envtest.Environment{
 		ErrorIfCRDPathMissing: true,
