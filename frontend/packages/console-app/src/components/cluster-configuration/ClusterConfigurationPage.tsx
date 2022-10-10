@@ -52,7 +52,7 @@ const ClusterConfigurationPage: React.FC<ClusterConfigurationPageProps> = ({ mat
       return (
         <Tab key={group.id} eventKey={group.id} title={group.label} translate="no">
           <Form onSubmit={(event) => event.preventDefault()}>
-            <h1>{group.label}</h1>
+            {/* <h1>{group.label}</h1> */}
             {items}
           </Form>
         </Tab>

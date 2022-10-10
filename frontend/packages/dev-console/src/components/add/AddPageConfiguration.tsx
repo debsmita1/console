@@ -3,7 +3,6 @@ import { DualListSelector, DualListSelectorTreeItemData } from '@patternfly/reac
 import { useTranslation } from 'react-i18next';
 import { AddAction, isAddAction, useResolvedExtensions } from '@console/dynamic-plugin-sdk/src';
 import './AddCardItem.scss';
-import { useAddActionExtensions } from '../../utils/useAddActionExtensions';
 
 const AddPageConfiguration: React.FC = () => {
   const { t } = useTranslation();
@@ -11,11 +10,14 @@ const AddPageConfiguration: React.FC = () => {
   const [allAddActionExtensions, allAddActionsResolved] = useResolvedExtensions<AddAction>(
     isAddAction,
   );
-  const [addActionExtensions, addActionExtensionsResolved] = useAddActionExtensions();
+  const [addActionExtensions, addActionExtensionsResolved] = useResolvedExtensions<AddAction>(
+    isAddAction,
+  );
 
   const [availableOptions, setAvailableOptions] = React.useState<React.ReactNode[]>([]);
   const [chosenOptions, setChosenOptions] = React.useState<React.ReactNode[]>([]);
 
+  /*
   React.useEffect(() => {
     if (addActionExtensionsResolved && allAddActionsResolved) {
       const disabledActions = allAddActionExtensions.filter((addAction) => {
@@ -68,25 +70,34 @@ const AddPageConfiguration: React.FC = () => {
         }),
       );
     }
-  }, [addActionExtensionsResolved, addActionExtensions]);
+  }, [
+    addActionExtensionsResolved,
+    addActionExtensions,
+    allAddActionsResolved,
+    allAddActionExtensions,
+  ]);
+  */
 
   const onListChange = (
     newAvailableOptions: DualListSelectorTreeItemData[],
     newChosenOptions: DualListSelectorTreeItemData[],
   ) => {
-    setAvailableOptions(newAvailableOptions);
-    setChosenOptions(newChosenOptions);
+    // setAvailableOptions(newAvailableOptions);
+    // setChosenOptions(newChosenOptions);
   };
 
   return (
-    <DualListSelector
-      availableOptionsTitle={t('devconsole~Enabled Add page options')}
-      chosenOptionsTitle={t('devconsole~Disabled Add page options')}
-      isSearchable
-      availableOptions={availableOptions}
-      chosenOptions={chosenOptions}
-      onListChange={onListChange}
-    />
+    <>
+      <h2>{t('devconsole~Add page')}</h2>
+      <DualListSelector
+        availableOptionsTitle={t('devconsole~Enabled Add page options')}
+        chosenOptionsTitle={t('devconsole~Disabled Add page options')}
+        isSearchable
+        availableOptions={availableOptions}
+        chosenOptions={chosenOptions}
+        onListChange={onListChange}
+      />
+    </>
   );
 };
 

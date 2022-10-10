@@ -227,6 +227,7 @@
       "component": { "$codeRef": "clusterConfiguration.ClusterConfigurationPage" }
     }
   },
+
   {
     "type": "console.cluster-configuration/group",
     "properties": {
@@ -250,6 +251,7 @@
       "insertAfter": "projects"
     }
   },
+  /*
   {
     "type": "console.cluster-configuration/item",
     "properties": {
@@ -259,35 +261,6 @@
       "description": "%console-app~The name that will be displayed in page titles, logo alt text, and the about dialog instead of the normal OpenShift product name.%",
       "field": {
         "type": "text"
-      },
-      "readAccessReview": [
-        {
-          "group": "operator.openshift.io/v1",
-          "resource": "consoles",
-          "verb": "get",
-          "name": "cluster"
-        }
-      ],
-      "writeAccessReview": [
-        {
-          "group": "operator.openshift.io/v1",
-          "resource": "consoles",
-          "verb": "patch",
-          "name": "cluster"
-        }
-      ]
-    }
-  },
-  {
-    "type": "console.cluster-configuration/item",
-    "properties": {
-      "id": "console-app.customization.perspectives",
-      "groupId": "general",
-      "label": "%console-app~Perspectives%",
-      "description": "%console-app~Show or hide perspectives by enabling, disabling or adding access review check(s).%",
-      "field": {
-        "type": "custom",
-        "component": { "$codeRef": "perspective.perspectiveConfiguration" }
       },
       "readAccessReview": [
         {
@@ -370,6 +343,36 @@
       ]
     }
   },
+  */
+  {
+    "type": "console.cluster-configuration/item",
+    "properties": {
+      "id": "console-app.customization.perspectives",
+      "groupId": "general",
+      "label": "%console-app~Perspectives%",
+      "description": "%console-app~Show or hide perspectives by enabling, disabling or adding access review check(s).%",
+      "field": {
+        "type": "custom",
+        "component": { "$codeRef": "perspective.perspectiveConfiguration" }
+      },
+      "readAccessReview": [
+        {
+          "group": "operator.openshift.io/v1",
+          "resource": "consoles",
+          "verb": "get",
+          "name": "cluster"
+        }
+      ],
+      "writeAccessReview": [
+        {
+          "group": "operator.openshift.io/v1",
+          "resource": "consoles",
+          "verb": "patch",
+          "name": "cluster"
+        }
+      ]
+    }
+  },
   {
     "type": "console.cluster-configuration/item",
     "properties": {
@@ -387,6 +390,11 @@
           "resource": "consoles",
           "verb": "get",
           "name": "cluster"
+        },
+        {
+          // "group": "console.openshift.io/v1",
+          "resource": "Quickstarts",
+          "verb": "list"
         }
       ],
       "writeAccessReview": [

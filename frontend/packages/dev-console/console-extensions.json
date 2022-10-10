@@ -40,6 +40,10 @@
           "resource": "consoles",
           "verb": "get",
           "name": "cluster"
+        },
+        {
+          "resource": "ClusterRole",
+          "verb": "list"
         }
       ],
       "writeAccessReview": [

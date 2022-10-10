@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
   CatalogItemType,
   isCatalogItemType,
@@ -11,9 +12,13 @@ enum CatalogVisibilityState {
 
 export const useGetAllDisabledSubCatalogs = () => {
   const [catalogExtensionsArray] = useResolvedExtensions<CatalogItemType>(isCatalogItemType);
-  const catalogTypeExtensions = catalogExtensionsArray.map((type) => {
-    return type.properties.type;
-  });
+  const catalogTypeExtensions = React.useMemo(
+    () =>
+      catalogExtensionsArray.map((type) => {
+        return type.properties.type;
+      }),
+    [catalogExtensionsArray],
+  );
 
   if (window.SERVER_FLAGS.developerCatalogTypes) {
     const developerCatalogTypes = JSON.parse(window.SERVER_FLAGS.developerCatalogTypes);

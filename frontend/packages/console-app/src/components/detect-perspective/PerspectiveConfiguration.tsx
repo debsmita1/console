@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { Checkbox, FormGroup } from '@patternfly/react-core';
+import {
+  Checkbox,
+  Select,
+  SelectOption,
+  SelectPosition,
+  SelectVariant,
+  FormGroup,
+} from '@patternfly/react-core';
+import { TableComposable, Caption, Tr, Tbody, Td } from '@patternfly/react-table';
 import { useTranslation } from 'react-i18next';
 import {
   isPerspective,
@@ -27,6 +35,37 @@ export type PerspectiveVisibility = {
 export type Perspective = {
   id: string;
   visibility: PerspectiveVisibility;
+};
+
+const PerspectiveSelect: React.FC = () => {
+  const { t } = useTranslation();
+  const [value, setValue] = React.useState('Enabled');
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  return (
+    <Select
+      isOpen={isOpen}
+      selections={value}
+      onToggle={(isExpanded) => setIsOpen(isExpanded)}
+      onSelect={(_, newValue: string) => {
+        setIsOpen(false);
+        setValue(newValue);
+      }}
+      position={SelectPosition.right}
+      variant={SelectVariant.single}
+    >
+      <SelectOption value="Enabled" title={t('console-app~Enabled')} />
+      <SelectOption
+        value="RequiredNamespace"
+        title={t('console-app~Only visible for privileged users')}
+      />
+      <SelectOption
+        value="MissingNamespace"
+        title={t('console-app~Only visible for unprivileged users')}
+      />
+      <SelectOption value="Disabled" title={t('console-app~Disabled')} />
+    </Select>
+  );
 };
 
 const PerspectiveConfiguration: React.FC = () => {
@@ -85,46 +124,68 @@ const PerspectiveConfiguration: React.FC = () => {
     [setIsChecked],
   );
   return (
-    <FormGroup fieldId="perspectives" label="Perspectives" data-test="perspectives field">
-      <div className="pf-c-form__helper-text">{t('console-app~Show or hide perspective(s).')}</div>
-      {perspectiveExtensions.map((ex) => (
-        <>
-          <h5>{ex.properties.name}</h5>
-          <Checkbox
-            className="nested"
-            label="Enabled"
-            name={ex.properties.name}
-            id={`${ex.properties.id}-enabled`}
-            isChecked={isChecked[ex.properties.id] === 'Enabled'}
-            onChange={() => handleOnChange(ex.properties.id, 'Enabled')}
-          />
-          <Checkbox
-            id={`${ex.properties.id}-priviledged`}
-            className="nested"
-            label="Only visible for privileged users"
-            name={ex.properties.name}
-            isChecked={isChecked[ex.properties.id] === 'AccessReviewRequired'}
-            onChange={() => handleOnChange(ex.properties.id, 'AccessReviewRequired')}
-          />
-          <Checkbox
-            id={`${ex.properties.id}-unpriviledged`}
-            className="nested"
-            label="Only visible for unprivileged users"
-            name={ex.properties.name}
-            isChecked={isChecked[ex.properties.id] === 'AccessReviewMissing'}
-            onChange={() => handleOnChange(ex.properties.id, 'AccessReviewMissing')}
-          />
-          <Checkbox
-            id={`${ex.properties.id}-disabled`}
-            className="nested"
-            label="Disabled"
-            name={ex.properties.name}
-            isChecked={isChecked[ex.properties.id] === 'Disabled'}
-            onChange={() => handleOnChange(ex.properties.id, 'Disabled')}
-          />
-        </>
-      ))}
-    </FormGroup>
+    <>
+      <h2>{t('console-app~Perspectives')}</h2>
+
+      <TableComposable variant="compact" borders={false} translate="no">
+        <Caption>{t('console-app~Show or hide perspective(s).')}</Caption>
+        <Tbody translate="no">
+          {perspectiveExtensions.map((perspectiveExtension) => (
+            <Tr key={perspectiveExtension.uid} translate="no">
+              <Td noPadding translate="no">
+                {perspectiveExtension.properties.name}
+              </Td>
+              <Td isActionCell translate="no">
+                <PerspectiveSelect />
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </TableComposable>
+
+      <FormGroup fieldId="perspectives" label="Perspectives" data-test="perspectives field">
+        <div className="pf-c-form__helper-text">
+          {t('console-app~Show or hide perspective(s).')}
+        </div>
+        {perspectiveExtensions.map((ex) => (
+          <>
+            <h5>{ex.properties.name}</h5>
+            <Checkbox
+              className="nested"
+              label="Enabled"
+              name={ex.properties.name}
+              id={`${ex.properties.id}-enabled`}
+              isChecked={isChecked[ex.properties.id] === 'Enabled'}
+              onChange={() => handleOnChange(ex.properties.id, 'Enabled')}
+            />
+            <Checkbox
+              id={`${ex.properties.id}-priviledged`}
+              className="nested"
+              label="Only visible for privileged users"
+              name={ex.properties.name}
+              isChecked={isChecked[ex.properties.id] === 'AccessReviewRequired'}
+              onChange={() => handleOnChange(ex.properties.id, 'AccessReviewRequired')}
+            />
+            <Checkbox
+              id={`${ex.properties.id}-unpriviledged`}
+              className="nested"
+              label="Only visible for unprivileged users"
+              name={ex.properties.name}
+              isChecked={isChecked[ex.properties.id] === 'AccessReviewMissing'}
+              onChange={() => handleOnChange(ex.properties.id, 'AccessReviewMissing')}
+            />
+            <Checkbox
+              id={`${ex.properties.id}-disabled`}
+              className="nested"
+              label="Disabled"
+              name={ex.properties.name}
+              isChecked={isChecked[ex.properties.id] === 'Disabled'}
+              onChange={() => handleOnChange(ex.properties.id, 'Disabled')}
+            />
+          </>
+        ))}
+      </FormGroup>
+    </>
   );
 };
 
