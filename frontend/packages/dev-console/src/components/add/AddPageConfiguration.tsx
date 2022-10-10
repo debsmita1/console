@@ -88,7 +88,6 @@ const AddPageConfiguration: React.FC = () => {
 
   return (
     <>
-      <h2>{t('devconsole~Add page')}</h2>
       <DualListSelector
         availableOptionsTitle={t('devconsole~Enabled Add page options')}
         chosenOptionsTitle={t('devconsole~Disabled Add page options')}

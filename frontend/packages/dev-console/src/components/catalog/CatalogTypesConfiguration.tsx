@@ -170,7 +170,6 @@ const CatalogTypesConfiguration: React.FC<{ readonly: boolean }> = ({ readonly }
 
   return (
     <>
-      <h2>{t('devconsole~Developer catalog')}</h2>
       <DualListSelector
         availableOptionsTitle={t('devconsole~Enabled types')}
         chosenOptionsTitle={t('devconsole~Disabled types')}

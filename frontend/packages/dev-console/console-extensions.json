@@ -28,7 +28,7 @@
     "properties": {
       "id": "dev-console.project-access.ProjectAccessRolesConfiguration",
       "groupId": "projects",
-      "label": "%devconsole~Project access Cluster Roles%",
+      "label": "%devconsole~Project access%",
       "description": "%devconsole~TODO%",
       "field": {
         "type": "custom",
@@ -61,7 +61,7 @@
     "properties": {
       "id": "dev-console.AddPageConfiguration",
       "groupId": "developer",
-      "label": "%devconsole~Add page actions%",
+      "label": "%devconsole~Add page%",
       "description": "%devconsole~TODO%",
       "field": {
         "type": "custom",
@@ -90,7 +90,7 @@
     "properties": {
       "id": "dev-console.DeveloperCatalogTypesConfiguration",
       "groupId": "developer",
-      "label": "%devconsole~Developer Catalog Types%",
+      "label": "%devconsole~Developer Catalog%",
       "description": "%devconsole~Enable or Disable Catalog types%",
       "field": {
         "type": "custom",

@@ -390,7 +390,7 @@
           "name": "cluster"
         },
         {
-          // "group": "console.openshift.io/v1",
+          "group": "console.openshift.io/v1",
           "resource": "Quickstarts",
           "verb": "list"
         }

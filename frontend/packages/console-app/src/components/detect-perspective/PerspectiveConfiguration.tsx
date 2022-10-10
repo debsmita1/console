@@ -125,10 +125,12 @@ const PerspectiveConfiguration: React.FC = () => {
   );
   return (
     <>
-      <h2>{t('console-app~Perspectives')}</h2>
-
       <TableComposable variant="compact" borders={false} translate="no">
-        <Caption>{t('console-app~Show or hide perspective(s).')}</Caption>
+        <Caption>
+          {t(
+            'console-app~Show or hide perspectives by enabling, disabling or adding access review check(s).',
+          )}
+        </Caption>
         <Tbody translate="no">
           {perspectiveExtensions.map((perspectiveExtension) => (
             <Tr key={perspectiveExtension.uid} translate="no">
@@ -142,8 +144,13 @@ const PerspectiveConfiguration: React.FC = () => {
           ))}
         </Tbody>
       </TableComposable>
+    </>
+  );
+};
 
-      <FormGroup fieldId="perspectives" label="Perspectives" data-test="perspectives field">
+export default PerspectiveConfiguration;
+
+/* <FormGroup fieldId="perspectives" label="Perspectives" data-test="perspectives field">
         <div className="pf-c-form__helper-text">
           {t('console-app~Show or hide perspective(s).')}
         </div>
@@ -185,8 +192,5 @@ const PerspectiveConfiguration: React.FC = () => {
           </>
         ))}
       </FormGroup>
-    </>
-  );
-};
 
-export default PerspectiveConfiguration;
+      */

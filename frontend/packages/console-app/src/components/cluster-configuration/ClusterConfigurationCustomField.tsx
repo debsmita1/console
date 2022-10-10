@@ -1,5 +1,6 @@
 import * as React from 'react';
 // import { UserPreferenceCustomField as CustomFieldType } from '@console/dynamic-plugin-sdk/src';
+import { FormGroup } from '@patternfly/react-core';
 import { ClusterConfigurationCustomField } from '@console/dynamic-plugin-sdk/src';
 import { ResolvedCodeRefProperties } from '@console/dynamic-plugin-sdk/src/types';
 import { ErrorBoundaryInline } from '@console/shared/src/components/error';
@@ -18,7 +19,11 @@ const ClusterConfigurationCustomField: React.FC<ClusterConfigurationCustomFieldP
 
   return (
     <ErrorBoundaryInline>
-      {CustomComponent ? <CustomComponent {...field.props} readonly={item.readonly} /> : null}
+      {CustomComponent ? (
+        <FormGroup fieldId={item.id} label={item.label} data-test={`${item.id} field`}>
+          <CustomComponent {...field.props} readonly={item.readonly} />
+        </FormGroup>
+      ) : null}
     </ErrorBoundaryInline>
   );
 };

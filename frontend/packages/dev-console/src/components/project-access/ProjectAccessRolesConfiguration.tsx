@@ -52,7 +52,6 @@ const ProjectAccessRolesConfiguration: React.FC = () => {
 
   return (
     <>
-      <h2>{t('devconsole~Project access')}</h2>
       <DualListSelector
         availableOptionsTitle={t('devconsole~Available Cluster Roles')}
         chosenOptionsTitle={t('devconsole~Chosen Cluster Roles')}
