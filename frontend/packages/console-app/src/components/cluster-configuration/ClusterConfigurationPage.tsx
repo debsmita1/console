@@ -66,7 +66,7 @@ const ClusterConfigurationPage: React.FC<ClusterConfigurationPageProps> = ({ mat
       <PageLayout
         title={t('console-app~Cluster configuration')}
         hint={t(
-          'Set cluster-wide configuration for the console experience. Your changes will be autosaved and will affect after a refresh.',
+          'console-app~Set cluster-wide configuration for the console experience. Your changes will be autosaved and will affect after a refresh.',
         )}
       >
         {loaded ? (
