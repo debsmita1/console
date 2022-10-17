@@ -18,6 +18,7 @@ import {
 } from '@console/dynamic-plugin-sdk/src';
 import { K8sResourceKind } from '@console/internal/module/k8s';
 import { useExtensions } from '@console/plugin-sdk';
+import { useTelemetry } from '@console/shared/src';
 import {
   useDebounceCallback,
   useConsoleOperatorConfig,
@@ -184,6 +185,7 @@ const PerspectiveVisibilitySelect: React.FC<{
 
 const PerspectiveConfiguration: React.FC<{ readonly: boolean }> = ({ readonly }) => {
   const { t } = useTranslation();
+  const fireTelemetryEvent = useTelemetry();
 
   // All available perspectives
   const perspectiveExtensions = useExtensions<PerspectiveExtension>(isPerspective);
@@ -239,6 +241,17 @@ const PerspectiveConfiguration: React.FC<{ readonly: boolean }> = ({ readonly })
                   newConfiguredPerspectives[index].visibility = newValue;
                 }
                 return newConfiguredPerspectives;
+              });
+              fireTelemetryEvent('Console cluster configuration changed', {
+                customize: 'Perspective',
+                id: perspectiveExtension.properties.id,
+                name: perspectiveExtension.properties.name,
+                visibility:
+                  newValue.state === PerspectiveVisibilityState.AccessReview
+                    ? newValue.accessReview.required
+                      ? 'required_namespace'
+                      : 'missing_namespace'
+                    : newValue.state,
               });
               save();
             };
